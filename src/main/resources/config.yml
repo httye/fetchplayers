@@ -1,0 +1,85 @@
+# UserInfoAPI 配置文件 v2.0
+# 安装即用配置 - 所有设置都有合理的默认值
+
+# API服务器配置
+api:
+  # 监听地址 (0.0.0.0 表示监听所有网络接口)
+  host: "0.0.0.0"
+  # 监听端口 (确保此端口未被其他服务占用)
+  port: 8080
+
+# 安全设置
+security:
+  # 是否启用API访问限制 (默认关闭，方便快速开始使用)
+  enabled: false
+  # 允许的IP地址列表 (如果启用安全设置)
+  allowed-ips:
+    - "127.0.0.1"
+    - "localhost"
+    - "192.168.1.0/24"
+  # API密钥设置 (插件会自动生成一个默认密钥)
+  api-keys:
+    # 默认生成的API密钥（建议修改）
+    - key: "UK_default_key_change_this"
+      name: "默认密钥"
+      description: "请更改为安全的密钥"
+      active: true
+
+# 限流设置 (防止API被滥用)
+rate-limit:
+  # 是否启用API限流 (推荐启用)
+  enabled: true
+  # 每分钟最大请求数
+  requests-per-minute: 60
+  # 每小时最大请求数
+  requests-per-hour: 1000
+
+# 批量查询设置
+batch-query:
+  # 是否启用批量查询功能
+  enabled: true
+  # 单次批量查询最大玩家数量
+  max-players: 50
+
+# 数据导出设置
+data-export:
+  # 是否启用数据导出功能
+  enabled: true
+  # 导出文件最大记录数
+  max-records: 1000
+  # 允许的导出格式
+  allowed-formats:
+    - "json"
+    - "csv"
+
+# 日志设置
+logging:
+  # 是否记录API请求
+  log-requests: true
+  # 是否记录错误信息
+  log-errors: true
+  # 是否记录调试信息 (开发时启用)
+  debug-mode: false
+
+# 缓存设置
+cache:
+  # 是否启用缓存
+  enabled: true
+  # 缓存过期时间 (秒)
+  expire-time: 30
+
+# 高级设置
+advanced:
+  # 请求超时时间 (秒)
+  request-timeout: 30
+  # 线程池大小
+  thread-pool-size: 10
+  # 是否启用详细错误信息 (生产环境建议关闭)
+  detailed-errors: true
+
+# 安装提示
+installation:
+  # 首次安装时显示提示信息
+  show-welcome-message: true
+  # 检查端口冲突
+  check-port-conflicts: true

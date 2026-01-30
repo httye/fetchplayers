@@ -1,0 +1,94 @@
+name: Build UserInfoAPI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  release:
+    types: [ created ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: Build with Maven
+      run: mvn clean package --file pom.xml
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: UserInfoAPI-JAR
+        path: target/*.jar
+        retention-days: 30
+    
+    - name: Upload PHP clients
+      uses: actions/upload-artifact@v3
+      with:
+        name: PHP-Clients
+        path: |
+          *.php
+          !install.php
+        retention-days: 30
+    
+    - name: Create Release
+      if: github.event_name == 'release'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: UserInfoAPI ${{ github.ref }}
+        body: |
+          UserInfoAPI Minecraft Paper 插件
+          
+          **作者**: httye
+          **项目**: UserInfoAPI
+          
+          ## 功能特性
+          - ✅ 零配置启动
+          - ✅ 批量查询
+          - ✅ 数据导出
+          - ✅ API限流
+          - ✅ PHP友好
+          
+          ## 文件说明
+          - `UserInfoAPI-*.jar` - 插件主文件
+          - `simple_php_client.php` - 简易PHP客户端
+          - `php_client_library.php` - 完整PHP客户端库
+          
+          ## 快速开始
+          1. 下载JAR文件并放入服务器plugins文件夹
+          2. 启动服务器
+          3. API地址: http://localhost:8080/api/status
+          
+          详细文档请查看README.md
+        draft: false
+        prerelease: false
+    
+    - name: Upload Release Asset
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: target/UserInfoAPI-*.jar
+        asset_name: UserInfoAPI-${{ github.ref }}.jar
+        asset_content_type: application/java-archive
