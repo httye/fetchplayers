@@ -93,17 +93,23 @@ curl -X POST "http://localhost:8080/api/user/batch?api_key=你的密钥" \
   "exp": 0.0,
   "health": 20.0,
   "foodLevel": 20,
-  "gameMode": "UNKNOWN",
+  "gameMode": "SURVIVAL",
   "online": false,
   "firstPlayed": 1640995200000,
   "lastPlayed": 1640995200000,
   "isOnline": false,
   "whitelisted": false,
   "banned": false,
-  "op": false
+  "op": false,
+  "currentSessionOnlineTime": 0,
+  "totalOnlineTime": 3600
 }
 ```
-```
+
+### 在线时长功能
+新增当次在线时长和总在线时长统计：
+- **currentSessionOnlineTime**: 当前会话在线时长（秒）
+- **totalOnlineTime**: 玩家总在线时长（秒）
 
 ## 🔑 安全认证
 

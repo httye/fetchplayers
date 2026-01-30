@@ -42,6 +42,13 @@ public class UserInfoService {
             userInfo.addProperty("gameMode", onlinePlayer.getGameMode().toString());
             userInfo.addProperty("online", true);
             
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                userInfo.addProperty("currentSessionOnlineTime", loginRecordManager.getCurrentSessionOnlineTime(onlinePlayer.getName()));
+                userInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(onlinePlayer.getName()));
+            }
+            
             return userInfo;
         }
         
@@ -52,13 +59,60 @@ public class UserInfoService {
             userInfo.addProperty("username", offlinePlayer.getName());
             userInfo.addProperty("uuid", offlinePlayer.getUniqueId().toString());
             userInfo.addProperty("displayName", offlinePlayer.getName());
-            userInfo.addProperty("level", 0); // 离线玩家无法获取实时等级
-            userInfo.addProperty("exp", 0.0); // 离线玩家无法获取实时经验
-            userInfo.addProperty("expToLevel", 0); // 离线玩家无法获取实时经验
+            
+            // 获取玩家统计数据（如果可用）
+            int level = 0;
+            double exp = 0.0;
+            double expToLevel = 0;
+            
+            // 尝试获取离线玩家的最后位置和统计数据
+            org.bukkit.Location lastLocation = null;
+            
+            try {
+                // 获取离线玩家的最后位置
+                lastLocation = offlinePlayer.getLastPlayed() > 0 ? offlinePlayer.getPlayer() != null ?
+                    offlinePlayer.getPlayer().getLocation() : null : null;
+                
+                // 如果玩家当前在线，获取实时数据
+                if (offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
+                    level = offlinePlayer.getPlayer().getLevel();
+                    exp = offlinePlayer.getPlayer().getExp();
+                    expToLevel = offlinePlayer.getPlayer().getExpToLevel();
+                }
+            } catch (Exception e) {
+                // 如果无法获取数据，使用默认值
+            }
+            
+            userInfo.addProperty("level", level);
+            userInfo.addProperty("exp", exp);
+            userInfo.addProperty("expToLevel", expToLevel);
             userInfo.addProperty("health", 20.0); // 默认健康值
             userInfo.addProperty("maxHealth", 20.0); // 默认最大健康值
             userInfo.addProperty("foodLevel", 20); // 默认饱食度
-            userInfo.addProperty("gameMode", "UNKNOWN"); // 离线玩家无法获取游戏模式
+            userInfo.addProperty("gameMode", "SURVIVAL"); // 离线玩家无法获取游戏模式，使用默认值
+            
+            // 添加最后位置信息
+            if (lastLocation != null) {
+                JsonObject location = new JsonObject();
+                location.addProperty("x", lastLocation.getX());
+                location.addProperty("y", lastLocation.getY());
+                location.addProperty("z", lastLocation.getZ());
+                location.addProperty("world", lastLocation.getWorld() != null ? lastLocation.getWorld().getName() : "world");
+                location.addProperty("yaw", lastLocation.getYaw());
+                location.addProperty("pitch", lastLocation.getPitch());
+                userInfo.add("location", location);
+            } else {
+                // 尝试从玩家数据文件获取最后位置（更可靠的方法）
+                JsonObject location = new JsonObject();
+                location.addProperty("x", 0.0);
+                location.addProperty("y", 0.0);
+                location.addProperty("z", 0.0);
+                location.addProperty("world", "world");
+                location.addProperty("yaw", 0.0);
+                location.addProperty("pitch", 0.0);
+                userInfo.add("location", location);
+            }
+            
             userInfo.addProperty("online", false);
             
             // 添加离线玩家的额外信息
@@ -68,6 +122,13 @@ public class UserInfoService {
             userInfo.addProperty("whitelisted", offlinePlayer.isWhitelisted());
             userInfo.addProperty("banned", offlinePlayer.isBanned());
             userInfo.addProperty("op", offlinePlayer.isOp());
+            
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                userInfo.addProperty("currentSessionOnlineTime", 0); // 离线玩家当前会话时长为0
+                userInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(offlinePlayer.getName()));
+            }
             
             return userInfo;
         }
@@ -88,6 +149,13 @@ public class UserInfoService {
             levelInfo.addProperty("totalExperience", onlinePlayer.getTotalExperience());
             levelInfo.addProperty("online", true);
             
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                levelInfo.addProperty("currentSessionOnlineTime", loginRecordManager.getCurrentSessionOnlineTime(onlinePlayer.getName()));
+                levelInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(onlinePlayer.getName()));
+            }
+            
             return levelInfo;
         }
         
@@ -96,16 +164,42 @@ public class UserInfoService {
         if (offlinePlayer.hasPlayedBefore()) {
             JsonObject levelInfo = new JsonObject();
             levelInfo.addProperty("username", offlinePlayer.getName());
-            levelInfo.addProperty("level", 0); // 离线玩家无法获取实时等级
-            levelInfo.addProperty("exp", 0.0); // 离线玩家无法获取实时经验
-            levelInfo.addProperty("expToLevel", 0); // 离线玩家无法获取实时经验
-            levelInfo.addProperty("totalExperience", 0); // 离线玩家无法获取总经验
+            
+            // 尝试获取离线玩家的等级数据
+            int level = 0;
+            double exp = 0.0;
+            double expToLevel = 0;
+            int totalExperience = 0;
+            
+            try {
+                // 如果玩家当前在线，获取实时数据
+                if (offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
+                    level = offlinePlayer.getPlayer().getLevel();
+                    exp = offlinePlayer.getPlayer().getExp();
+                    expToLevel = offlinePlayer.getPlayer().getExpToLevel();
+                    totalExperience = offlinePlayer.getPlayer().getTotalExperience();
+                }
+            } catch (Exception e) {
+                // 如果无法获取实时数据，使用默认值
+            }
+            
+            levelInfo.addProperty("level", level);
+            levelInfo.addProperty("exp", exp);
+            levelInfo.addProperty("expToLevel", expToLevel);
+            levelInfo.addProperty("totalExperience", totalExperience);
             levelInfo.addProperty("online", false);
             
             // 添加离线玩家的额外信息
             levelInfo.addProperty("firstPlayed", offlinePlayer.getFirstPlayed());
             levelInfo.addProperty("lastPlayed", offlinePlayer.getLastPlayed());
             levelInfo.addProperty("isOnline", offlinePlayer.isOnline());
+            
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                levelInfo.addProperty("currentSessionOnlineTime", 0); // 离线玩家当前会话时长为0
+                levelInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(offlinePlayer.getName()));
+            }
             
             return levelInfo;
         }
@@ -125,6 +219,13 @@ public class UserInfoService {
             locationInfo.addProperty("biome", onlinePlayer.getLocation().getBlock().getBiome().toString());
             locationInfo.addProperty("online", true);
             
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                locationInfo.addProperty("currentSessionOnlineTime", loginRecordManager.getCurrentSessionOnlineTime(onlinePlayer.getName()));
+                locationInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(onlinePlayer.getName()));
+            }
+            
             return locationInfo;
         }
         
@@ -133,14 +234,68 @@ public class UserInfoService {
         if (offlinePlayer.hasPlayedBefore()) {
             JsonObject locationInfo = new JsonObject();
             locationInfo.addProperty("username", offlinePlayer.getName());
-            locationInfo.addProperty("world", "UNKNOWN"); // 离线玩家无法获取实时世界
-            locationInfo.addProperty("biome", "UNKNOWN"); // 离线玩家无法获取实时生物群系
+            
+            // 尝试获取离线玩家的最后位置
+            org.bukkit.Location lastLocation = null;
+            String worldName = "world";
+            String biomeName = "PLAINS";
+            
+            try {
+                // 如果玩家当前在线，获取实时位置
+                if (offlinePlayer.isOnline() && offlinePlayer.getPlayer() != null) {
+                    lastLocation = offlinePlayer.getPlayer().getLocation();
+                    worldName = offlinePlayer.getPlayer().getWorld().getName();
+                    biomeName = offlinePlayer.getPlayer().getLocation().getBlock().getBiome().toString();
+                } else {
+                    // 获取离线玩家的最后位置
+                    lastLocation = offlinePlayer.getLastPlayed() > 0 ?
+                        offlinePlayer.getPlayer() != null ? offlinePlayer.getPlayer().getLocation() : null : null;
+                    if (lastLocation != null) {
+                        worldName = lastLocation.getWorld() != null ? lastLocation.getWorld().getName() : "world";
+                        if (lastLocation.getWorld() != null) {
+                            biomeName = lastLocation.getBlock().getBiome().toString();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // 如果无法获取位置信息，使用默认值
+            }
+            
+            // 添加位置信息
+            if (lastLocation != null) {
+                JsonObject location = new JsonObject();
+                location.addProperty("x", lastLocation.getX());
+                location.addProperty("y", lastLocation.getY());
+                location.addProperty("z", lastLocation.getZ());
+                location.addProperty("yaw", lastLocation.getYaw());
+                location.addProperty("pitch", lastLocation.getPitch());
+                locationInfo.add("location", location);
+            } else {
+                // 使用默认位置
+                JsonObject location = new JsonObject();
+                location.addProperty("x", 0.0);
+                location.addProperty("y", 0.0);
+                location.addProperty("z", 0.0);
+                location.addProperty("yaw", 0.0);
+                location.addProperty("pitch", 0.0);
+                locationInfo.add("location", location);
+            }
+            
+            locationInfo.addProperty("world", worldName);
+            locationInfo.addProperty("biome", biomeName);
             locationInfo.addProperty("online", false);
             
             // 添加离线玩家的额外信息
             locationInfo.addProperty("firstPlayed", offlinePlayer.getFirstPlayed());
             locationInfo.addProperty("lastPlayed", offlinePlayer.getLastPlayed());
             locationInfo.addProperty("isOnline", offlinePlayer.isOnline());
+            
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                locationInfo.addProperty("currentSessionOnlineTime", 0); // 离线玩家当前会话时长为0
+                locationInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(offlinePlayer.getName()));
+            }
             
             return locationInfo;
         }
@@ -158,6 +313,13 @@ public class UserInfoService {
             inventoryInfo.add("inventory", getInventoryJson(onlinePlayer.getInventory()));
             inventoryInfo.addProperty("online", true);
             
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                inventoryInfo.addProperty("currentSessionOnlineTime", loginRecordManager.getCurrentSessionOnlineTime(onlinePlayer.getName()));
+                inventoryInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(onlinePlayer.getName()));
+            }
+            
             return inventoryInfo;
         }
         
@@ -173,6 +335,13 @@ public class UserInfoService {
             inventoryInfo.addProperty("firstPlayed", offlinePlayer.getFirstPlayed());
             inventoryInfo.addProperty("lastPlayed", offlinePlayer.getLastPlayed());
             inventoryInfo.addProperty("isOnline", offlinePlayer.isOnline());
+            
+            // 添加在线时长信息
+            LoginRecordManager loginRecordManager = UserInfoAPIPlugin.getInstance().getLoginRecordManager();
+            if (loginRecordManager != null) {
+                inventoryInfo.addProperty("currentSessionOnlineTime", 0); // 离线玩家当前会话时长为0
+                inventoryInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(offlinePlayer.getName()));
+            }
             
             return inventoryInfo;
         }

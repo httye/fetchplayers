@@ -169,12 +169,71 @@ public class LoginRecordManager implements Listener {
                 playerInfo.addProperty("onlineTime", (new Date().getTime() - session.loginTime.getTime()) / 1000);
             }
             
+            // 添加总在线时长
+            long totalOnlineTime = getTotalOnlineTime(player.getName());
+            playerInfo.addProperty("totalOnlineTime", totalOnlineTime);
+            
             players.add(playerInfo);
         }
         
         result.addProperty("count", players.size());
         result.add("players", players);
         return result;
+    }
+    
+    /**
+     * 获取玩家的总在线时长（秒）
+     */
+    public long getTotalOnlineTime(String username) {
+        long totalSeconds = 0;
+        
+        try {
+            Player player = plugin.getServer().getPlayer(username);
+            if (player != null) {
+                String playerId = player.getUniqueId().toString();
+                File[] recordFiles = dataFolder.listFiles((dir, name) -> name.startsWith(playerId));
+                
+                if (recordFiles != null) {
+                    for (File file : recordFiles) {
+                        try (FileReader reader = new FileReader(file)) {
+                            JsonObject record = gson.fromJson(reader, JsonObject.class);
+                            if (record.has("onlineTime")) {
+                                totalSeconds += record.get("onlineTime").getAsLong();
+                            }
+                        } catch (IOException e) {
+                            plugin.getLogger().warning("读取登录记录失败: " + e.getMessage());
+                        }
+                    }
+                }
+            }
+            
+            // 添加当前会话的在线时间（如果在线）
+            if (player != null) {
+                LoginSession currentSession = activeSessions.get(player.getUniqueId());
+                if (currentSession != null) {
+                    totalSeconds += (new Date().getTime() - currentSession.loginTime.getTime()) / 1000;
+                }
+            }
+            
+        } catch (Exception e) {
+            plugin.getLogger().warning("计算总在线时长失败: " + e.getMessage());
+        }
+        
+        return totalSeconds;
+    }
+    
+    /**
+     * 获取玩家当前会话的在线时长（秒）
+     */
+    public long getCurrentSessionOnlineTime(String username) {
+        Player player = plugin.getServer().getPlayer(username);
+        if (player != null) {
+            LoginSession currentSession = activeSessions.get(player.getUniqueId());
+            if (currentSession != null) {
+                return (new Date().getTime() - currentSession.loginTime.getTime()) / 1000;
+            }
+        }
+        return 0;
     }
     
     private String formatDate(Date date) {

@@ -36,7 +36,13 @@
 - 添加`online`字段区分玩家状态
 - 提供`firstPlayed`、`lastPlayed`等额外信息
 
-### 3. 数据导出功能
+### 3. 在线时长统计 ✨
+- **LoginRecordManager.java** - 扩展登录记录功能
+- **UserInfoService.java** - 添加`currentSessionOnlineTime`和`totalOnlineTime`字段
+- 支持查询当次在线时长和总在线时长
+- 在线玩家显示当前会话时长，离线玩家显示总时长
+
+### 4. 数据导出功能
 - **DataExportHandler.java** - 支持JSON/CSV格式导出
 - 可导出在线玩家、所有玩家、登录记录
 - 自动生成带时间戳的文件名

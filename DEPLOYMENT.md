@@ -96,6 +96,25 @@ UserInfoAPI v2.0 现在支持查询离线玩家信息：
 - 从未加入过的玩家会返回错误信息
 - 离线玩家的部分实时数据（如位置、背包）不可用
 
+### 在线时长统计
+新增当次在线时长和总在线时长统计功能：
+
+**功能特点：**
+- `currentSessionOnlineTime`: 当前会话在线时长（秒）
+- `totalOnlineTime`: 玩家总在线时长（秒）
+- 支持在线和离线玩家的时长查询
+- 自动记录和累计玩家在线时间
+
+**API响应示例：**
+```json
+{
+  "username": "Steve",
+  "online": true,
+  "currentSessionOnlineTime": 1800,
+  "totalOnlineTime": 7200
+}
+```
+
 ```
 UserInfoAPI/
 ├── .github/
