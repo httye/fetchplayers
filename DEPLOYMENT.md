@@ -67,6 +67,35 @@ git push origin main
 
 确保你的仓库包含以下文件：
 
+## 🆕 新增功能说明
+
+### 离线玩家支持
+UserInfoAPI v2.0 现在支持查询离线玩家信息：
+
+**功能特点：**
+- 支持查询曾经加入过服务器的离线玩家基本信息
+- 在线玩家返回实时数据，离线玩家返回历史数据
+- 自动添加 `online` 字段区分玩家状态
+- 提供 `firstPlayed`、`lastPlayed` 等额外信息
+
+**API响应示例：**
+```json
+{
+  "username": "Steve",
+  "uuid": "8667ba71b85a407a960c8e4e30a6b02d",
+  "online": false,
+  "firstPlayed": 1640995200000,
+  "lastPlayed": 1640995200000,
+  "level": 0,
+  "exp": 0.0
+}
+```
+
+**注意事项：**
+- 只能查询曾经加入过服务器的玩家
+- 从未加入过的玩家会返回错误信息
+- 离线玩家的部分实时数据（如位置、背包）不可用
+
 ```
 UserInfoAPI/
 ├── .github/

@@ -29,12 +29,19 @@
 - 减少API调用次数，提高性能
 - 支持多种查询类型（info, level, location, inventory）
 
-### 2. 数据导出功能
+### 2. 离线玩家支持 ✨
+- **UserInfoService.java** - 使用Bukkit离线玩家API
+- 支持查询曾经加入过服务器的离线玩家信息
+- 在线玩家返回实时数据，离线玩家返回历史数据
+- 添加`online`字段区分玩家状态
+- 提供`firstPlayed`、`lastPlayed`等额外信息
+
+### 3. 数据导出功能
 - **DataExportHandler.java** - 支持JSON/CSV格式导出
 - 可导出在线玩家、所有玩家、登录记录
 - 自动生成带时间戳的文件名
 
-### 3. API限流保护
+### 4. API限流保护
 - **RateLimitHandler.java** - 防止API被滥用
 - 支持按IP和API密钥限流
 - 可配置每分钟/每小时请求限制

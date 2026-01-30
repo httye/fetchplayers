@@ -23,70 +23,161 @@ public class UserInfoService {
     }
     
     public JsonObject getUserInfo(String username) {
-        Player player = Bukkit.getPlayer(username);
-        if (player == null) {
-            return null;
+        Player onlinePlayer = Bukkit.getPlayer(username);
+        
+        // 如果玩家在线，返回完整信息
+        if (onlinePlayer != null) {
+            JsonObject userInfo = new JsonObject();
+            userInfo.addProperty("username", onlinePlayer.getName());
+            userInfo.addProperty("uuid", onlinePlayer.getUniqueId().toString());
+            userInfo.addProperty("displayName", onlinePlayer.getDisplayName());
+            userInfo.addProperty("level", onlinePlayer.getLevel());
+            userInfo.addProperty("exp", onlinePlayer.getExp());
+            userInfo.addProperty("expToLevel", onlinePlayer.getExpToLevel());
+            userInfo.add("location", getLocationJson(onlinePlayer.getLocation()));
+            userInfo.add("inventory", getInventoryJson(onlinePlayer.getInventory()));
+            userInfo.addProperty("health", onlinePlayer.getHealth());
+            userInfo.addProperty("maxHealth", onlinePlayer.getMaxHealth());
+            userInfo.addProperty("foodLevel", onlinePlayer.getFoodLevel());
+            userInfo.addProperty("gameMode", onlinePlayer.getGameMode().toString());
+            userInfo.addProperty("online", true);
+            
+            return userInfo;
         }
         
-        JsonObject userInfo = new JsonObject();
-        userInfo.addProperty("username", player.getName());
-        userInfo.addProperty("uuid", player.getUniqueId().toString());
-        userInfo.addProperty("displayName", player.getDisplayName());
-        userInfo.addProperty("level", player.getLevel());
-        userInfo.addProperty("exp", player.getExp());
-        userInfo.addProperty("expToLevel", player.getExpToLevel());
-        userInfo.add("location", getLocationJson(player.getLocation()));
-        userInfo.add("inventory", getInventoryJson(player.getInventory()));
-        userInfo.addProperty("health", player.getHealth());
-        userInfo.addProperty("maxHealth", player.getMaxHealth());
-        userInfo.addProperty("foodLevel", player.getFoodLevel());
-        userInfo.addProperty("gameMode", player.getGameMode().toString());
+        // 如果玩家离线，尝试获取离线玩家信息
+        org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(username);
+        if (offlinePlayer.hasPlayedBefore()) {
+            JsonObject userInfo = new JsonObject();
+            userInfo.addProperty("username", offlinePlayer.getName());
+            userInfo.addProperty("uuid", offlinePlayer.getUniqueId().toString());
+            userInfo.addProperty("displayName", offlinePlayer.getName());
+            userInfo.addProperty("level", 0); // 离线玩家无法获取实时等级
+            userInfo.addProperty("exp", 0.0); // 离线玩家无法获取实时经验
+            userInfo.addProperty("expToLevel", 0); // 离线玩家无法获取实时经验
+            userInfo.addProperty("health", 20.0); // 默认健康值
+            userInfo.addProperty("maxHealth", 20.0); // 默认最大健康值
+            userInfo.addProperty("foodLevel", 20); // 默认饱食度
+            userInfo.addProperty("gameMode", "UNKNOWN"); // 离线玩家无法获取游戏模式
+            userInfo.addProperty("online", false);
+            
+            // 添加离线玩家的额外信息
+            userInfo.addProperty("firstPlayed", offlinePlayer.getFirstPlayed());
+            userInfo.addProperty("lastPlayed", offlinePlayer.getLastPlayed());
+            userInfo.addProperty("isOnline", offlinePlayer.isOnline());
+            userInfo.addProperty("whitelisted", offlinePlayer.isWhitelisted());
+            userInfo.addProperty("banned", offlinePlayer.isBanned());
+            userInfo.addProperty("op", offlinePlayer.isOp());
+            
+            return userInfo;
+        }
         
-        return userInfo;
+        return null;
     }
     
     public JsonObject getUserLevel(String username) {
-        Player player = Bukkit.getPlayer(username);
-        if (player == null) {
-            return null;
+        Player onlinePlayer = Bukkit.getPlayer(username);
+        
+        // 如果玩家在线，返回实时信息
+        if (onlinePlayer != null) {
+            JsonObject levelInfo = new JsonObject();
+            levelInfo.addProperty("username", onlinePlayer.getName());
+            levelInfo.addProperty("level", onlinePlayer.getLevel());
+            levelInfo.addProperty("exp", onlinePlayer.getExp());
+            levelInfo.addProperty("expToLevel", onlinePlayer.getExpToLevel());
+            levelInfo.addProperty("totalExperience", onlinePlayer.getTotalExperience());
+            levelInfo.addProperty("online", true);
+            
+            return levelInfo;
         }
         
-        JsonObject levelInfo = new JsonObject();
-        levelInfo.addProperty("username", player.getName());
-        levelInfo.addProperty("level", player.getLevel());
-        levelInfo.addProperty("exp", player.getExp());
-        levelInfo.addProperty("expToLevel", player.getExpToLevel());
-        levelInfo.addProperty("totalExperience", player.getTotalExperience());
+        // 如果玩家离线，尝试获取离线玩家信息
+        org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(username);
+        if (offlinePlayer.hasPlayedBefore()) {
+            JsonObject levelInfo = new JsonObject();
+            levelInfo.addProperty("username", offlinePlayer.getName());
+            levelInfo.addProperty("level", 0); // 离线玩家无法获取实时等级
+            levelInfo.addProperty("exp", 0.0); // 离线玩家无法获取实时经验
+            levelInfo.addProperty("expToLevel", 0); // 离线玩家无法获取实时经验
+            levelInfo.addProperty("totalExperience", 0); // 离线玩家无法获取总经验
+            levelInfo.addProperty("online", false);
+            
+            // 添加离线玩家的额外信息
+            levelInfo.addProperty("firstPlayed", offlinePlayer.getFirstPlayed());
+            levelInfo.addProperty("lastPlayed", offlinePlayer.getLastPlayed());
+            levelInfo.addProperty("isOnline", offlinePlayer.isOnline());
+            
+            return levelInfo;
+        }
         
-        return levelInfo;
+        return null;
     }
     
     public JsonObject getUserLocation(String username) {
-        Player player = Bukkit.getPlayer(username);
-        if (player == null) {
-            return null;
+        Player onlinePlayer = Bukkit.getPlayer(username);
+        
+        // 如果玩家在线，返回实时位置信息
+        if (onlinePlayer != null) {
+            JsonObject locationInfo = new JsonObject();
+            locationInfo.addProperty("username", onlinePlayer.getName());
+            locationInfo.add("location", getLocationJson(onlinePlayer.getLocation()));
+            locationInfo.addProperty("world", onlinePlayer.getWorld().getName());
+            locationInfo.addProperty("biome", onlinePlayer.getLocation().getBlock().getBiome().toString());
+            locationInfo.addProperty("online", true);
+            
+            return locationInfo;
         }
         
-        JsonObject locationInfo = new JsonObject();
-        locationInfo.addProperty("username", player.getName());
-        locationInfo.add("location", getLocationJson(player.getLocation()));
-        locationInfo.addProperty("world", player.getWorld().getName());
-        locationInfo.addProperty("biome", player.getLocation().getBlock().getBiome().toString());
+        // 如果玩家离线，尝试获取离线玩家信息
+        org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(username);
+        if (offlinePlayer.hasPlayedBefore()) {
+            JsonObject locationInfo = new JsonObject();
+            locationInfo.addProperty("username", offlinePlayer.getName());
+            locationInfo.addProperty("world", "UNKNOWN"); // 离线玩家无法获取实时世界
+            locationInfo.addProperty("biome", "UNKNOWN"); // 离线玩家无法获取实时生物群系
+            locationInfo.addProperty("online", false);
+            
+            // 添加离线玩家的额外信息
+            locationInfo.addProperty("firstPlayed", offlinePlayer.getFirstPlayed());
+            locationInfo.addProperty("lastPlayed", offlinePlayer.getLastPlayed());
+            locationInfo.addProperty("isOnline", offlinePlayer.isOnline());
+            
+            return locationInfo;
+        }
         
-        return locationInfo;
+        return null;
     }
     
     public JsonObject getUserInventory(String username) {
-        Player player = Bukkit.getPlayer(username);
-        if (player == null) {
-            return null;
+        Player onlinePlayer = Bukkit.getPlayer(username);
+        
+        // 如果玩家在线，返回实时背包信息
+        if (onlinePlayer != null) {
+            JsonObject inventoryInfo = new JsonObject();
+            inventoryInfo.addProperty("username", onlinePlayer.getName());
+            inventoryInfo.add("inventory", getInventoryJson(onlinePlayer.getInventory()));
+            inventoryInfo.addProperty("online", true);
+            
+            return inventoryInfo;
         }
         
-        JsonObject inventoryInfo = new JsonObject();
-        inventoryInfo.addProperty("username", player.getName());
-        inventoryInfo.add("inventory", getInventoryJson(player.getInventory()));
+        // 如果玩家离线，尝试获取离线玩家信息
+        org.bukkit.OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(username);
+        if (offlinePlayer.hasPlayedBefore()) {
+            JsonObject inventoryInfo = new JsonObject();
+            inventoryInfo.addProperty("username", offlinePlayer.getName());
+            inventoryInfo.add("inventory", new JsonArray()); // 离线玩家无法获取实时背包
+            inventoryInfo.addProperty("online", false);
+            
+            // 添加离线玩家的额外信息
+            inventoryInfo.addProperty("firstPlayed", offlinePlayer.getFirstPlayed());
+            inventoryInfo.addProperty("lastPlayed", offlinePlayer.getLastPlayed());
+            inventoryInfo.addProperty("isOnline", offlinePlayer.isOnline());
+            
+            return inventoryInfo;
+        }
         
-        return inventoryInfo;
+        return null;
     }
     
     private JsonObject getLocationJson(Location location) {

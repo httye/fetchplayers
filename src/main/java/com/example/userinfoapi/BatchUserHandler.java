@@ -98,6 +98,15 @@ public class BatchUserHandler implements HttpHandler {
                             continue;
                     }
                     
+                    // 检查是否找到了玩家（在线或离线）
+                    if (data != null) {
+                        playerResult.add("data", data);
+                        playerResult.addProperty("success", true);
+                    } else {
+                        playerResult.addProperty("error", "玩家未找到（可能从未加入过服务器）");
+                        playerResult.addProperty("success", false);
+                    }
+                    
                     if (data != null) {
                         playerResult.add("data", data);
                         playerResult.addProperty("success", true);

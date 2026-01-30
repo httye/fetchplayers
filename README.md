@@ -44,6 +44,7 @@ if (isPlayerOnline('Steve')) {
 
 - ✅ **零配置启动** - 插件安装后立即可用
 - ✅ **批量查询** - 一次性查询多个玩家信息
+- ✅ **离线玩家支持** - 即使玩家离线也能获取基本信息
 - ✅ **数据导出** - 支持JSON/CSV格式导出
 - ✅ **API限流** - 防止API被滥用
 - ✅ **智能缓存** - 提高响应速度
@@ -70,12 +71,38 @@ if (isPlayerOnline('Steve')) {
 | `/api/export?type=players&format=json` | GET | 导出玩家数据 |
 | `/api/user/login-records?username=Steve` | GET | 获取玩家登录记录 |
 | `/api/security/info` | GET | 获取安全系统信息 |
-
 ### 批量查询示例
 ```bash
 curl -X POST "http://localhost:8080/api/user/batch?api_key=你的密钥" \
   -H "Content-Type: application/json" \
   -d '{"usernames":["Steve","Alex"],"queryType":"info"}'
+```
+
+### 离线玩家查询
+现在支持查询离线玩家的基本信息（需要玩家曾经加入过服务器）：
+- **在线玩家**: 返回实时数据，`online` 字段为 `true`
+- **离线玩家**: 返回历史数据，`online` 字段为 `false`
+- **从未加入的玩家**: 返回错误信息
+
+示例响应：
+```json
+{
+  "username": "Steve",
+  "uuid": "8667ba71b85a407a960c8e4e30a6b02d",
+  "level": 0,
+  "exp": 0.0,
+  "health": 20.0,
+  "foodLevel": 20,
+  "gameMode": "UNKNOWN",
+  "online": false,
+  "firstPlayed": 1640995200000,
+  "lastPlayed": 1640995200000,
+  "isOnline": false,
+  "whitelisted": false,
+  "banned": false,
+  "op": false
+}
+```
 ```
 
 ## 🔑 安全认证
