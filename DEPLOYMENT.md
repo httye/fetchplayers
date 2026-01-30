@@ -113,6 +113,11 @@ UserInfoAPI/
     distribution: 'temurin'
 ```
 
+### 更新GitHub Actions版本
+注意：GitHub Actions的某些操作可能需要更新到最新版本：
+- `actions/upload-artifact@v4` (替代过时的v3)
+- `softprops/action-gh-release@v2` (替代过时的create-release)
+
 ### 修改触发条件
 在 `.github/workflows/build.yml` 中修改：
 ```yaml
