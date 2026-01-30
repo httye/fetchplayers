@@ -49,6 +49,14 @@ public class UserInfoService {
                 userInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(onlinePlayer.getName()));
             }
             
+            // 添加挖掘统计信息
+            MiningStatsManager miningStatsManager = UserInfoAPIPlugin.getInstance().getMiningStatsManager();
+            if (miningStatsManager != null) {
+                JsonObject miningSummary = miningStatsManager.getPlayerMiningSummary(onlinePlayer.getName());
+                userInfo.add("miningStats", miningSummary.get("totalMined"));
+                userInfo.add("miningSummary", miningStatsManager.getPlayerMiningSummary(onlinePlayer.getName()));
+            }
+            
             return userInfo;
         }
         
@@ -128,6 +136,14 @@ public class UserInfoService {
             if (loginRecordManager != null) {
                 userInfo.addProperty("currentSessionOnlineTime", 0); // 离线玩家当前会话时长为0
                 userInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(offlinePlayer.getName()));
+            }
+            
+            // 添加挖掘统计信息
+            MiningStatsManager miningStatsManager = UserInfoAPIPlugin.getInstance().getMiningStatsManager();
+            if (miningStatsManager != null) {
+                JsonObject miningSummary = miningStatsManager.getPlayerMiningSummary(offlinePlayer.getName());
+                userInfo.add("miningStats", miningSummary.get("totalMined"));
+                userInfo.add("miningSummary", miningStatsManager.getPlayerMiningSummary(offlinePlayer.getName()));
             }
             
             return userInfo;

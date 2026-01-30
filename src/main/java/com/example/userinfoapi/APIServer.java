@@ -56,6 +56,7 @@ public class APIServer {
         // 新增功能路由
         server.createContext("/api/user/batch", new RateLimitHandler(new SecurityHandler(new BatchUserHandler(plugin)), plugin));
         server.createContext("/api/export", new RateLimitHandler(new SecurityHandler(new DataExportHandler(plugin)), plugin));
+        server.createContext("/api/mining", new RateLimitHandler(new SecurityHandler(new MiningStatsHandler(plugin)), plugin));
         
         // 设置线程池
         server.setExecutor(Executors.newCachedThreadPool());
@@ -117,6 +118,10 @@ public class APIServer {
             }
             return (double) sum / responseTimes.size();
         }
+    }
+    
+    public RateLimitHandler getRateLimitHandler() {
+        return rateLimitHandler;
     }
     
     private class StatusHandler implements HttpHandler {

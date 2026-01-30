@@ -16,6 +16,7 @@ public class UserInfoAPIPlugin extends JavaPlugin {
     private Logger logger;
     private SecurityManager securityManager;
     private LoginRecordManager loginRecordManager;
+    private MiningStatsManager miningStatsManager;
     
     @Override
     public void onEnable() {
@@ -35,6 +36,10 @@ public class UserInfoAPIPlugin extends JavaPlugin {
             // 初始化登录记录管理器
             loginRecordManager = new LoginRecordManager(this);
             getServer().getPluginManager().registerEvents(loginRecordManager, this);
+            
+            // 初始化挖掘统计管理器
+            miningStatsManager = new MiningStatsManager(this);
+            getServer().getPluginManager().registerEvents(miningStatsManager, this);
             
             // 启动API服务器
             startAPIServer();
@@ -205,5 +210,17 @@ public class UserInfoAPIPlugin extends JavaPlugin {
     
     public LoginRecordManager getLoginRecordManager() {
         return loginRecordManager;
+    }
+    
+    public MiningStatsManager getMiningStatsManager() {
+        return miningStatsManager;
+    }
+    
+    public RateLimitHandler getRateLimitHandler() {
+        return apiServer != null ? apiServer.getRateLimitHandler() : null;
+    }
+    
+    public com.google.gson.Gson getGson() {
+        return new com.google.gson.Gson();
     }
 }
