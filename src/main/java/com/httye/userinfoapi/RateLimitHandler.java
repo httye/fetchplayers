@@ -1,4 +1,4 @@
-package com.example.userinfoapi;
+package com.httye.userinfoapi;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;

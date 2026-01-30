@@ -1,4 +1,4 @@
-package com.example.userinfoapi;
+package com.httye.userinfoapi;
 
 import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;

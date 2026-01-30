@@ -1,4 +1,4 @@
-package com.example.userinfoapi;
+package com.httye.userinfoapi;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -47,16 +47,6 @@ public class UserInfoService {
             if (loginRecordManager != null) {
                 userInfo.addProperty("currentSessionOnlineTime", loginRecordManager.getCurrentSessionOnlineTime(onlinePlayer.getName()));
                 userInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(onlinePlayer.getName()));
-            }
-            
-            // 添加挖掘统计信息
-            MiningStatsManager miningStatsManager = UserInfoAPIPlugin.getInstance().getMiningStatsManager();
-            if (miningStatsManager != null) {
-                JsonObject miningSummary = miningStatsManager.getPlayerMiningSummary(onlinePlayer.getName());
-                if (miningSummary.has("totalMined")) {
-                    userInfo.add("miningStats", miningSummary.get("totalMined"));
-                }
-                userInfo.add("miningSummary", miningSummary);
             }
             
             return userInfo;
@@ -138,16 +128,6 @@ public class UserInfoService {
             if (loginRecordManager != null) {
                 userInfo.addProperty("currentSessionOnlineTime", 0); // 离线玩家当前会话时长为0
                 userInfo.addProperty("totalOnlineTime", loginRecordManager.getTotalOnlineTime(offlinePlayer.getName()));
-            }
-            
-            // 添加挖掘统计信息
-            MiningStatsManager miningStatsManager = UserInfoAPIPlugin.getInstance().getMiningStatsManager();
-            if (miningStatsManager != null) {
-                JsonObject miningSummary = miningStatsManager.getPlayerMiningSummary(offlinePlayer.getName());
-                if (miningSummary.has("totalMined")) {
-                    userInfo.add("miningStats", miningSummary.get("totalMined"));
-                }
-                userInfo.add("miningSummary", miningSummary);
             }
             
             return userInfo;

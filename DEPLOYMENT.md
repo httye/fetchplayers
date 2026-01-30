@@ -115,35 +115,6 @@ UserInfoAPI v2.0 现在支持查询离线玩家信息：
 }
 ```
 
-### 挖掘统计功能
-新增挖掘统计和排行榜功能：
-
-**功能特点：**
-- 自动记录玩家挖掘的所有方块数量
-- 支持按方块类型查看排行榜
-- 提供玩家挖掘摘要信息
-- 支持多种可挖掘方块类型（矿石、石头、泥土等）
-
-**API端点：**
-- `GET /api/mining/player?username=Steve` - 获取玩家挖掘统计
-- `GET /api/mining/leaderboard?block=coal_ore&limit=10` - 获取指定方块排行榜
-- `GET /api/mining/leaderboard?limit=10` - 获取所有方块排行榜
-- `GET /api/mining/summary?username=Steve` - 获取玩家挖掘摘要
-
-**API响应示例：**
-```json
-{
-  "username": "Steve",
-  "miningStats": 150,
-  "miningSummary": {
-    "username": "Steve",
-    "totalMined": 150,
-    "uniqueBlocks": 5,
-    "mostMinedBlock": "COBBLESTONE",
-    "mostMinedCount": 80
-  }
-}
-```
 
 ```
 UserInfoAPI/

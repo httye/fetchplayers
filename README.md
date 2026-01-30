@@ -111,14 +111,6 @@ curl -X POST "http://localhost:8080/api/user/batch?api_key=你的密钥" \
 - **currentSessionOnlineTime**: 当前会话在线时长（秒）
 - **totalOnlineTime**: 玩家总在线时长（秒）
 
-### 挖掘统计功能
-新增挖掘统计和排行榜功能：
-- **挖掘统计**: 自动记录玩家挖掘的方块数量
-- **排行榜**: 支持按方块类型查看挖掘排行榜
-- **API端点**: `/api/mining/player?username=Steve` - 获取玩家挖掘统计
-- **API端点**: `/api/mining/leaderboard?block=coal_ore&limit=10` - 获取指定方块排行榜
-- **API端点**: `/api/mining/leaderboard?limit=10` - 获取所有方块排行榜
-- **API端点**: `/api/mining/summary?username=Steve` - 获取玩家挖掘摘要
 
 ## 🔑 安全认证
 

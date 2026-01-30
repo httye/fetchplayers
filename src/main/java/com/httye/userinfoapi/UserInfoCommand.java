@@ -1,4 +1,4 @@
-package com.example.userinfoapi;
+package com.httye.userinfoapi;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
