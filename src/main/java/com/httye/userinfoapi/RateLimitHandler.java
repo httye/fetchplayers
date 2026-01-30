@@ -28,7 +28,7 @@ public class RateLimitHandler implements HttpHandler {
     
     // 存储请求计数
     private final ConcurrentHashMap<String, RateLimitData> rateLimitMap = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    private final ScheduledExecutorService scheduler;
     
     public RateLimitHandler(HttpHandler nextHandler, UserInfoAPIPlugin plugin) {
         this.nextHandler = nextHandler;
@@ -38,6 +38,10 @@ public class RateLimitHandler implements HttpHandler {
         this.enabled = plugin.getConfig().getBoolean("rate-limit.enabled", true);
         this.requestsPerMinute = plugin.getConfig().getInt("rate-limit.requests-per-minute", 60);
         this.requestsPerHour = plugin.getConfig().getInt("rate-limit.requests-per-hour", 1000);
+        
+        // 从配置读取线程池大小
+        int threadPoolSize = plugin.getConfig().getInt("advanced.thread-pool-size", 2);
+        this.scheduler = Executors.newScheduledThreadPool(threadPoolSize);
         
         // 启动定时清理任务
         startCleanupTask();

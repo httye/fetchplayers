@@ -201,7 +201,8 @@ public class DataExportHandler implements HttpHandler {
     
     private String exportLoginRecordsToJSON(String username) {
         try {
-            JsonObject records = plugin.getLoginRecordManager().getLoginRecords(username, 100);
+            int maxRecords = plugin.getConfig().getInt("data-export.max-records", 100);
+            JsonObject records = plugin.getLoginRecordManager().getLoginRecords(username, maxRecords);
             records.addProperty("exportTime", getCurrentTimestamp());
             records.addProperty("exportedUsername", username);
             return records.toString();

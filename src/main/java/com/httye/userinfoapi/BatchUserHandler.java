@@ -58,8 +58,9 @@ public class BatchUserHandler implements HttpHandler {
             }
             
             JsonArray usernamesArray = request.getAsJsonArray("usernames");
-            if (usernamesArray.size() > 50) {
-                sendErrorResponse(exchange, 400, "一次最多查询50个玩家");
+            int maxPlayers = plugin.getConfig().getInt("batch-query.max-players", 50);
+            if (usernamesArray.size() > maxPlayers) {
+                sendErrorResponse(exchange, 400, "一次最多查询" + maxPlayers + "个玩家");
                 return;
             }
             

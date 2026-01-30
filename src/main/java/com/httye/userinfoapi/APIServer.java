@@ -58,7 +58,8 @@ public class APIServer {
         server.createContext("/api/export", new RateLimitHandler(new SecurityHandler(new DataExportHandler(plugin)), plugin));
         
         // 设置线程池
-        server.setExecutor(Executors.newCachedThreadPool());
+        int threadPoolSize = plugin.getConfig().getInt("advanced.thread-pool-size", 10);
+        server.setExecutor(Executors.newFixedThreadPool(threadPoolSize));
         
         server.start();
     }
