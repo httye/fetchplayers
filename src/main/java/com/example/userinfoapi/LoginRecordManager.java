@@ -132,7 +132,13 @@ public class LoginRecordManager implements Listener {
                 current.addProperty("logoutTime", "在线中");
                 current.addProperty("onlineTime", (new Date().getTime() - currentSession.loginTime.getTime()) / 1000);
                 current.addProperty("isOnline", true);
-                records.add(0, current); // 添加到最前面
+                // 创建新的JsonArray，将当前会话放在最前面，然后添加其他记录
+                JsonArray newRecords = new JsonArray();
+                newRecords.add(current);
+                for (int i = 0; i < records.size(); i++) {
+                    newRecords.add(records.get(i));
+                }
+                records = newRecords;
             }
             
             result.addProperty("username", username);

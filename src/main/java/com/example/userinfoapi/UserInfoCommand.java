@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.ChatColor;
+import com.google.gson.JsonArray;
 
 public class UserInfoCommand implements CommandExecutor {
     
