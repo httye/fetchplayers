@@ -32,14 +32,14 @@ jobs:
       run: mvn clean package --file pom.xml
     
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: UserInfoAPI-JAR
         path: target/*.jar
         retention-days: 30
     
     - name: Upload PHP clients
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: PHP-Clients
         path: |
@@ -49,12 +49,12 @@ jobs:
     
     - name: Create Release
       if: github.event_name == 'release'
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: UserInfoAPI ${{ github.ref }}
+        name: UserInfoAPI ${{ github.ref }}
         body: |
           UserInfoAPI Minecraft Paper 插件
           
@@ -84,11 +84,10 @@ jobs:
     
     - name: Upload Release Asset
       if: github.event_name == 'release'
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: target/UserInfoAPI-*.jar
-        asset_name: UserInfoAPI-${{ github.ref }}.jar
-        asset_content_type: application/java-archive
+        files: target/UserInfoAPI-*.jar
+        name: UserInfoAPI-${{ github.ref }}
+        tag_name: ${{ github.ref }}
