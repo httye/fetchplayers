@@ -53,8 +53,10 @@ public class UserInfoService {
             MiningStatsManager miningStatsManager = UserInfoAPIPlugin.getInstance().getMiningStatsManager();
             if (miningStatsManager != null) {
                 JsonObject miningSummary = miningStatsManager.getPlayerMiningSummary(onlinePlayer.getName());
-                userInfo.add("miningStats", miningSummary.get("totalMined"));
-                userInfo.add("miningSummary", miningStatsManager.getPlayerMiningSummary(onlinePlayer.getName()));
+                if (miningSummary.has("totalMined")) {
+                    userInfo.add("miningStats", miningSummary.get("totalMined"));
+                }
+                userInfo.add("miningSummary", miningSummary);
             }
             
             return userInfo;
@@ -142,8 +144,10 @@ public class UserInfoService {
             MiningStatsManager miningStatsManager = UserInfoAPIPlugin.getInstance().getMiningStatsManager();
             if (miningStatsManager != null) {
                 JsonObject miningSummary = miningStatsManager.getPlayerMiningSummary(offlinePlayer.getName());
-                userInfo.add("miningStats", miningSummary.get("totalMined"));
-                userInfo.add("miningSummary", miningStatsManager.getPlayerMiningSummary(offlinePlayer.getName()));
+                if (miningSummary.has("totalMined")) {
+                    userInfo.add("miningStats", miningSummary.get("totalMined"));
+                }
+                userInfo.add("miningSummary", miningSummary);
             }
             
             return userInfo;

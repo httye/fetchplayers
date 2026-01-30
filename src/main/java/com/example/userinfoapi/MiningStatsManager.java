@@ -108,13 +108,23 @@ public class MiningStatsManager implements Listener {
         JsonObject result = new JsonObject();
         result.addProperty("username", username);
         
-        Player player = plugin.getServer().getPlayer(username);
-        if (player == null) {
-            result.addProperty("error", "玩家未找到");
-            return result;
+        // 首先尝试获取在线玩家
+        Player onlinePlayer = plugin.getServer().getPlayer(username);
+        UUID playerId;
+        
+        if (onlinePlayer != null) {
+            playerId = onlinePlayer.getUniqueId();
+        } else {
+            // 如果玩家离线，尝试获取离线玩家的UUID
+            org.bukkit.OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(username);
+            if (offlinePlayer.hasPlayedBefore()) {
+                playerId = offlinePlayer.getUniqueId();
+            } else {
+                result.addProperty("error", "玩家未找到");
+                return result;
+            }
         }
         
-        UUID playerId = player.getUniqueId();
         Map<Material, Integer> stats = playerMiningStats.get(playerId);
         
         if (stats != null) {
@@ -222,13 +232,23 @@ public class MiningStatsManager implements Listener {
         JsonObject result = new JsonObject();
         result.addProperty("username", username);
         
-        Player player = plugin.getServer().getPlayer(username);
-        if (player == null) {
-            result.addProperty("error", "玩家未找到");
-            return result;
+        // 首先尝试获取在线玩家
+        Player onlinePlayer = plugin.getServer().getPlayer(username);
+        UUID playerId;
+        
+        if (onlinePlayer != null) {
+            playerId = onlinePlayer.getUniqueId();
+        } else {
+            // 如果玩家离线，尝试获取离线玩家的UUID
+            org.bukkit.OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(username);
+            if (offlinePlayer.hasPlayedBefore()) {
+                playerId = offlinePlayer.getUniqueId();
+            } else {
+                result.addProperty("error", "玩家未找到");
+                return result;
+            }
         }
         
-        UUID playerId = player.getUniqueId();
         Map<Material, Integer> stats = playerMiningStats.get(playerId);
         
         if (stats != null) {
