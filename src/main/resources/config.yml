@@ -77,6 +77,22 @@ advanced:
   # 是否启用详细错误信息 (生产环境建议关闭)
   detailed-errors: true
 
+# 聊天记录设置
+chat-logging:
+  # 是否启用聊天记录功能
+  enabled: true
+  # 每个玩家最多保留的聊天记录数
+  max-records-per-player: 100
+  # 是否将聊天记录写入文件
+  log-to-file: false
+
+# 服务器资源监控设置
+resource-monitoring:
+  # 是否启用资源监控
+  enabled: true
+  # 监控刷新间隔 (秒)
+  refresh-interval: 5
+
 # 安装提示
 installation:
   # 首次安装时显示提示信息

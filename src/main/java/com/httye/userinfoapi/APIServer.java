@@ -56,6 +56,10 @@ public class APIServer {
         // 新增功能路由
         server.createContext("/api/user/batch", new RateLimitHandler(new SecurityHandler(new BatchUserHandler(plugin)), plugin));
         server.createContext("/api/export", new RateLimitHandler(new SecurityHandler(new DataExportHandler(plugin)), plugin));
+
+        // 聊天记录和服务器资源监控路由
+        server.createContext("/api/chat-records", new RateLimitHandler(new SecurityHandler(new ChatRecordsHandler()), plugin));
+        server.createContext("/api/server/resources", new RateLimitHandler(new SecurityHandler(new ServerResourceHandler()), plugin));
         
         // 设置线程池
         int threadPoolSize = plugin.getConfig().getInt("advanced.thread-pool-size", 10);

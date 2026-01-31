@@ -16,6 +16,7 @@ public class UserInfoAPIPlugin extends JavaPlugin {
     private Logger logger;
     private SecurityManager securityManager;
     private LoginRecordManager loginRecordManager;
+    private ChatRecordManager chatRecordManager;
     
     @Override
     public void onEnable() {
@@ -35,6 +36,10 @@ public class UserInfoAPIPlugin extends JavaPlugin {
             // 初始化登录记录管理器
             loginRecordManager = new LoginRecordManager(this);
             getServer().getPluginManager().registerEvents(loginRecordManager, this);
+
+            // 初始化聊天记录管理器
+            chatRecordManager = new ChatRecordManager(this);
+            getServer().getPluginManager().registerEvents(chatRecordManager, this);
             
             // 启动API服务器
             startAPIServer();
@@ -155,6 +160,7 @@ public class UserInfoAPIPlugin extends JavaPlugin {
         logger.info("限流功能: " + (getConfig().getBoolean("rate-limit.enabled") ? "启用" : "禁用"));
         logger.info("批量查询: " + (getConfig().getBoolean("batch-query.enabled") ? "启用" : "禁用"));
         logger.info("数据导出: " + (getConfig().getBoolean("data-export.enabled") ? "启用" : "禁用"));
+        logger.info("聊天记录: " + (getConfig().getBoolean("chat-logging.enabled") ? "启用" : "禁用"));
         
         // 显示API密钥信息
         if (getConfig().getBoolean("security.enabled")) {
@@ -206,7 +212,11 @@ public class UserInfoAPIPlugin extends JavaPlugin {
     public LoginRecordManager getLoginRecordManager() {
         return loginRecordManager;
     }
-    
+
+    public ChatRecordManager getChatRecordManager() {
+        return chatRecordManager;
+    }
+
     public RateLimitHandler getRateLimitHandler() {
         return apiServer != null ? apiServer.getRateLimitHandler() : null;
     }

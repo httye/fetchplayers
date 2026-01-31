@@ -218,6 +218,41 @@ class MinecraftUserAPI {
     public function setTimeout($timeout) {
         $this->timeout = max(1, min($timeout, 300)); // 限制在1-300秒之间
     }
+
+    /**
+     * 获取玩家聊天记录
+     * @param string $username 玩家名，不提供则返回所有玩家概览
+     * @param int $limit 返回记录数量限制
+     * @return array 聊天记录数组
+     */
+    public function getChatRecords($username = null, $limit = 0) {
+        $params = array();
+
+        if ($username !== null && !empty($username)) {
+            $params['username'] = $username;
+        }
+
+        if ($limit > 0) {
+            $params['limit'] = $limit;
+        }
+
+        return $this->makeRequest('/chat-records', $params);
+    }
+
+    /**
+     * 获取服务器资源监控信息
+     * @param string $type 返回类型 (all, memory, cpu, tps)
+     * @return array 服务器资源信息
+     */
+    public function getServerResources($type = 'all') {
+        $params = array();
+
+        if ($type !== null && !empty($type)) {
+            $params['type'] = $type;
+        }
+
+        return $this->makeRequest('/server/resources', $params);
+    }
 }
 
 // ==================== 使用示例 ====================
@@ -306,6 +341,115 @@ try {
              " (在线时长: " . formatTime($player['onlineTime']) . ")\n";
     }
     
+} catch (Exception $e) {
+    echo "错误: " . $e->getMessage() . "\n";
+}
+
+// 示例6: 获取玩家聊天记录
+try {
+    $api = new MinecraftUserAPI("http://localhost:8080/api", "你的API密钥");
+
+    // 获取特定玩家的聊天记录
+    $chat_records = $api->getChatRecords("Steve", 10);
+
+    echo "=== Steve 的最近聊天记录 ===\n";
+    if (isset($chat_records['messages'])) {
+        foreach ($chat_records['messages'] as $message) {
+            echo "[" . $message['timestamp'] . "] " .
+                 $message['playerName'] . ": " .
+                 $message['message'] . "\n";
+        }
+    } else {
+        echo "暂无聊天记录\n";
+    }
+
+    // 获取所有玩家的聊天记录概览
+    $all_chat = $api->getChatRecords();
+    echo "\n聊天记录概览:\n";
+    echo "总玩家数: " . $all_chat['totalPlayers'] . "\n";
+    echo "总消息数: " . $all_chat['totalMessages'] . "\n";
+
+    // 获取所有玩家的聊天记录（限制50条）
+    $all_messages = $api->getChatRecords(null, 50, true);
+    echo "\n=== 所有玩家的最近聊天记录（最近50条）===\n";
+    if (isset($all_messages['messages'])) {
+        foreach ($all_messages['messages'] as $message) {
+            echo "[" . $message['timestamp'] . "] " .
+                 $message['playerName'] . ": " .
+                 $message['message'] . "\n";
+        }
+        echo "\n共 " . $all_messages['count'] . " 条记录\n";
+        echo "涉及玩家数: " . $all_messages['totalPlayers'] . "\n";
+    } else {
+        echo "暂无聊天记录\n";
+    }
+
+} catch (Exception $e) {
+    echo "错误: " . $e->getMessage() . "\n";
+}
+
+// 示例7: 获取服务器资源监控信息
+try {
+    $api = new MinecraftUserAPI("http://localhost:8080/api", "你的API密钥");
+
+    // 获取所有资源信息
+    $all_resources = $api->getServerResources('all');
+
+    echo "=== 服务器资源监控 ===\n";
+
+    // 内存信息
+    if (isset($all_resources['data']['memory'])) {
+        $memory = $all_resources['data']['memory'];
+        echo "\n内存使用:\n";
+        echo "已使用: " . $memory['used'] . "\n";
+        echo "最大: " . $memory['max'] . "\n";
+        echo "使用率: " . $memory['usagePercent'] . "%\n";
+        echo "空闲: " . $memory['free'] . "\n";
+    }
+
+    // CPU信息
+    if (isset($all_resources['data']['cpu'])) {
+        $cpu = $all_resources['data']['cpu'];
+        echo "\nCPU信息:\n";
+        echo "处理器数量: " . $cpu['availableProcessors'] . "\n";
+        echo "系统负载: " . $cpu['systemLoadAverage'] . "\n";
+        echo "使用率: " . $cpu['usagePercent'] . "%\n";
+        echo "操作系统: " . $cpu['osName'] . " " . $cpu['osVersion'] . "\n";
+    }
+
+    // TPS信息
+    if (isset($all_resources['data']['tps'])) {
+        $tps = $all_resources['data']['tps'];
+        echo "\nTPS (每秒刻数):\n";
+        echo "当前TPS: " . $tps['currentTps'] . "\n";
+        echo "最近1分钟: " . $tps['tps1m'] . "\n";
+        echo "最近5分钟: " . $tps['tps5m'] . "\n";
+        echo "最近15分钟: " . $tps['tps15m'] . "\n";
+    }
+
+    // 服务器信息
+    echo "\n服务器信息:\n";
+    echo "服务器名称: " . $all_resources['data']['serverName'] . "\n";
+    echo "服务器版本: " . $all_resources['data']['serverVersion'] . "\n";
+    echo "在线玩家: " . $all_resources['data']['onlinePlayers'] . "/" .
+         $all_resources['data']['maxPlayers'] . "\n";
+
+} catch (Exception $e) {
+    echo "错误: " . $e->getMessage() . "\n";
+}
+
+// 示例8: 只获取特定类型的资源信息
+try {
+    $api = new MinecraftUserAPI("http://localhost:8080/api", "你的API密钥");
+
+    // 只获取内存信息
+    $memory = $api->getServerResources('memory');
+    echo "内存使用率: " . $memory['data']['usagePercent'] . "%\n";
+
+    // 只获取TPS信息
+    $tps = $api->getServerResources('tps');
+    echo "当前TPS: " . $tps['data']['currentTps'] . "\n";
+
 } catch (Exception $e) {
     echo "错误: " . $e->getMessage() . "\n";
 }

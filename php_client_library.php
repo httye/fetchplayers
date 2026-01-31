@@ -269,7 +269,7 @@ class MinecraftUserAPI {
             $status = $this->getServerStatus();
             $online = $this->getOnlinePlayers();
             $security = $this->getSecurityInfo();
-            
+
             return array(
                 'server_status' => $status,
                 'online_players' => $online,
@@ -279,6 +279,44 @@ class MinecraftUserAPI {
         } catch (Exception $e) {
             throw new Exception("获取服务器摘要失败: " . $e->getMessage());
         }
+    }
+
+    /**
+     * 获取玩家聊天记录
+     * @param string $username 玩家名，不提供则根据 $all 参数决定
+     * @param int $limit 返回记录数量限制
+     * @param bool $all 是否获取所有玩家的聊天记录
+     * @return array 聊天记录数组
+     */
+    public function getChatRecords($username = null, $limit = 0, $all = false) {
+        $params = array();
+
+        if ($username !== null && !empty($username)) {
+            $params['username'] = $username;
+        } elseif ($all) {
+            $params['all'] = 'true';
+        }
+
+        if ($limit > 0) {
+            $params['limit'] = $limit;
+        }
+
+        return $this->makeRequest('/chat-records', $params);
+    }
+
+    /**
+     * 获取服务器资源监控信息
+     * @param string $type 返回类型 (all, memory, cpu, tps)
+     * @return array 服务器资源信息
+     */
+    public function getServerResources($type = 'all') {
+        $params = array();
+
+        if ($type !== null && !empty($type)) {
+            $params['type'] = $type;
+        }
+
+        return $this->makeRequest('/server/resources', $params);
     }
     
     /**
